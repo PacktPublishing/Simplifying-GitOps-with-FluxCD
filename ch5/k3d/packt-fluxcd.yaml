@@ -1,0 +1,16 @@
+---
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: packt-fluxcd
+servers: 1
+agents: 2
+image: docker.io/rancher/k3s:v1.29.3-k3s1
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs: # additional arguments passed to the `k3s server|agent` command; same as `--k3s-arg`
+      - arg: "--disable=traefik,servicelb,metrics-server"
+        nodeFilters:
+          - server:*
+  k3d:
+    disableLoadbalancer: true

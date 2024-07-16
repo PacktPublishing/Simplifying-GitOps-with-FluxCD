@@ -1,0 +1,59 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: python-demo
+  namespace: default
+spec:
+  image: registry.localhost:5000/python-demo
+  provider: generic
+  interval: 1m0s
+  insecure: true
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: python-demo
+  namespace: default
+spec:
+  imageRepositoryRef:
+    name: python-demo
+  policy:
+    semver:
+      range: 1.0.x
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: python-demo
+  namespace: default
+spec:
+  interval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  git:
+    commit:
+      author:
+        name: Fluxbot
+        email: flux@packt.com
+      messageTemplate: "{{range .Updated.Images}}{{println .}}{{end}}"
+    checkout:
+      ref:
+        branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: python-demo
+  namespace: default
+spec:
+  interval: 1m0s
+  path: ./ch3/apps/python-demo/k8s
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: default

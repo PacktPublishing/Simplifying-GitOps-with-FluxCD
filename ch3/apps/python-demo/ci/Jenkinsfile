@@ -1,0 +1,43 @@
+podTemplate(
+  label: "python-builder",
+  idleMinutes: 10,
+  serviceAccount: 'default',
+
+  containers: [
+    containerTemplate(
+      name: 'python',
+      image: 'python:3.12-alpine3.19',
+      ttyEnabled: true,
+      command: 'cat',
+      resourceRequestMemory: "200M",
+      resourceLimitMemory: "250M"
+    ),
+    containerTemplate(
+      name: 'kaniko',
+      image: 'gcr.io/kaniko-project/executor:v1.22.0-debug',
+      ttyEnabled: true,
+      command: 'cat'
+    ),
+  ],
+) {
+  node("python-builder") {
+    stage("checkout") {
+      checkout scm
+    }
+    container('python') {
+      stage("prereq") {
+        sh("pip install -r ch3/apps/python-demo/src/requirements.txt")
+        sh("pip install pylint")
+      }
+      stage('linter') {
+        sh("pylint ch3/apps/python-demo/src/ --exit-zero")
+      }
+    }
+    container('kaniko') {
+      def imageName = "registry.localhost:5000/python-demo:1.0."
+      stage('build and publish') {
+        sh("/kaniko/executor --context ch3/apps/python-demo/src/ --destination ${imageName}${BUILD_ID}")
+      }
+    }
+  }
+}
