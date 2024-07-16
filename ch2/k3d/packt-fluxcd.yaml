@@ -1,0 +1,11 @@
+---
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: packt-fluxcd
+servers: 1
+agents: 2
+image: docker.io/rancher/k3s:v1.29.3-k3s1
+options:
+  k3d:
+    disableLoadbalancer: true

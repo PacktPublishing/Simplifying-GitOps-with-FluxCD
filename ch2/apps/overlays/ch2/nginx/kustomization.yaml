@@ -1,0 +1,9 @@
+resources:
+  - ../../../base/nginx
+
+namePrefix: ch2-
+
+images:
+  - name: nginx
+    newName: nginx
+    newTag: "1.18"
