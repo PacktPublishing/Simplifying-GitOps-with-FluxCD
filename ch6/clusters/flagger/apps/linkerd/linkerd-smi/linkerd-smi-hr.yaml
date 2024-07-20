@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: linkerd-smi
+  labels:
+    linkerd.io/extension: smi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: linkerd-smi
+  namespace: linkerd-smi
+spec:
+  interval: 1m0s
+  targetNamespace: linkerd-smi
+  releaseName: linkerd-smi
+  chart:
+    spec:
+      chart: linkerd-smi
+      version: '1.0.4'
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd-smi
+  values:
+    clusterDomain: cluster.local
+    linkerdNamespace: linkerd

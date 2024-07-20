@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: aws-creds
+type: Opaque
+data:
+    aws_access_key_id: ENC[AES256_GCM,data:+M0h7hcDwNxc/Q9iKbAUR3o0OHiw,iv:Z8B7Usu65qFOEwSvNDsbvNKya5JNHCu/38Q+8vQOE2o=,tag:PYqJ/vr0JklnRKtpUEQlrw==,type:str]
+    aws_secret_access_key: ENC[AES256_GCM,data:jPzJwOcZH5J8jil+/StfkUL9gVfcxWtnpYyNmThCxI8XoDZxUjRbgQ==,iv:tG55BqtkleEp4RfRhpVZEIeHO3F3oaBrpW+lbmqsKlM=,tag:9j3I60Ga3jkFdcAWRlLHcQ==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qa758j82uydurz5l5j976zfjvyfmy3l67hmpaxmcxvw7wvwh5vvsq0jtmc
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBSaS9JWWlEbGp0aTBPSDV5
+            UnVCMDU0b3R4Z3pNQVFXR3I0LzF1aHQxMUc4CnQ4ZDBSeWpMT3hJeE4vSXNTSmpw
+            eDFJS3liWHN5ZWVDQWR2R1Rjamt6blUKLS0tIE1vbE9TdDh1YjgwT1c5aFJ6Ymx5
+            cEVSeG1JNGMrUWlYOWdJbTk3Y3NKbmMKM8b22B8vjUmOXBihLobdUll/d7C5Y2FO
+            1O1Cp3/Pzykzwlzfe5MemxoGlvb6vHu5qSKhPTqQs5dSGDek8S03kg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-05-13T17:13:20Z"
+    mac: ENC[AES256_GCM,data:ghRLiXsWGcngZDrVl+L2KN2cvIAV1drzdrpfqa7c4auu3KbO4q4jTiJioszxLgpPCSNiQSnRnN3gQhcHohRsqbl3lxQCAIgp6RTQcWnygzs6pjdTIEJy2tFWm5AdCmZ06BJYmutNcQ/9kR99fYYO3kE/A+6e+n6mEwAEpdaBAIU=,iv:WnbgzQHQ4/ymFCWbF7MLjcvvhAEEUnwcfNDe71pYmzw=,tag:BJ7MzAC/WijiAsJQocCTHQ==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.8.1

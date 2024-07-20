@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flagger-hr-ks
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: flagger-ns-ks
+  suspend: false
+  path: ./ch6/clusters/flagger/apps/flagger/app
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s

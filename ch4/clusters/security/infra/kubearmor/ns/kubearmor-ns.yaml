@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubearmor
+  labels:
+    app.kubernetes.io/name: kubearmor
+    app.kubernetes.io/instance: kubearmor

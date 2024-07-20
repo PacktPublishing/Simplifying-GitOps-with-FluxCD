@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: linkerd-crds
+  namespace: linkerd
+spec:
+  chart:
+    spec:
+      version: '2024.5.1'
+      chart: linkerd-crds
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd-edge
+  install:
+    crds: Create
+    remediation:
+      retries: 5
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 5
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: 10m
+    recreate: true
+    cleanupOnFail: true
+  interval: 1m0s
+  targetNamespace: linkerd
+  releaseName: linkerd-crds

@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubearmor-sidekick
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  chart:
+    spec:
+      chart: sidekick
+      version: "v0.1" # Ensure this matches the desired version constraint
+      sourceRef:
+        kind: HelmRepository
+        name: kubearmor
+        namespace: flux-system
+      interval: 1m
+  releaseName: sidekick
+  targetNamespace: kubearmor
+  values:
+    config:
+      slack:
+        webhookurl: "https://hooks.slack.com/services/...."
+        # channel: "kubearmor-alerts"
+        # -- Slack Footer
+        footer: ""
+        # -- Slack icon (avatar)
+        icon: ""
+        # -- Slack username
+        username: ""
+        # -- `all` (default), `text` (only text is displayed in Slack), `fields` (only fields are displayed in Slack)
+        outputformat: "all"
+        # -- minimum priority of event to use this output, order is `emergency\|alert\|critical\|error\|warning\|notice\|informational\|debug or ""`
+        minimumpriority: ""
+        # -- a Go template to format Slack Text above Attachment, displayed in addition to the output from `slack.outputformat`. If empty, no Text is displayed before Attachment
+        messageformat: ""

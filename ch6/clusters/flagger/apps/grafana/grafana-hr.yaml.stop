@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flagger-grafana
+  namespace: flagger-system
+spec:
+  chart:
+    spec:
+      chart: grafana
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: flagger-system
+      version: 1.7.0
+  interval: 1m0s
+  releaseName: flagger-grafana
+  targetNamespace: flagger-system
+  maxHistory: 3
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
+  rollback:
+    disableWait: true
+  values:
+    url: http://prometheus:9090

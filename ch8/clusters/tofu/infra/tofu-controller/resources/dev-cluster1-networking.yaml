@@ -1,0 +1,27 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: dev-cluster1-networking
+  namespace: terraform
+spec:
+  approvePlan: auto
+  destroy: false
+  destroyResourcesOnDeletion: false
+  retryInterval: "15s"
+  interval: 24h
+  path: ./terraform/cluster1/networking
+  sourceRef:
+    kind: GitRepository
+    name: ch8-tofu-eks
+    namespace: flux-system
+  storeReadablePlan: human
+  serviceAccountName: "tofu-controller-sa"
+  backendConfig:
+    customConfiguration: |
+      backend "s3" {
+        bucket         = "tofu-dev-eks"
+        dynamodb_table = "tofu-dev-eks-tf-state-lock"
+        key            = "tofu-dev-cluster1/networking.tfstate"
+        region         = "us-east-1"
+        encrypt        = true
+      }

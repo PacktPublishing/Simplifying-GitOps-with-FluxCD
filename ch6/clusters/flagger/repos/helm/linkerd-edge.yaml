@@ -1,0 +1,27 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: linkerd-edge
+  namespace: linkerd
+spec:
+  interval: 1h
+  url: https://helm.linkerd.io/edge
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: linkerd-edge
+  namespace: linkerd-viz
+spec:
+  interval: 1h
+  url: https://helm.linkerd.io/edge
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: linkerd-smi
+  namespace: linkerd-smi
+spec:
+  interval: 1h
+  url: https://linkerd.github.io/linkerd-smi

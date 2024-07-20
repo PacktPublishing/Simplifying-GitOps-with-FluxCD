@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubearmor-operator
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  chart:
+    spec:
+      chart: kubearmor-operator
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: kubearmor
+      version: "v1.3.2"
+  releaseName: kubearmor
+  targetNamespace: kubearmor
+  maxHistory: 3
+  install:
+    crds: CreateReplace
+    disableWait: true
+  upgrade:
+    crds: CreateReplace
+    disableWait: true
+  rollback:
+    disableWait: true
+  values:
+    autoDeploy: false
