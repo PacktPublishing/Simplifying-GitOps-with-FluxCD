@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1 
+kind: Ingress 
+metadata: 
+  name: webhook-receiver 
+  namespace: flux-system 
+  annotations: 
+    kubernetes.io/ingress.class: alb 
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]' 
+    alb.ingress.kubernetes.io/scheme: internal 
+    alb.ingress.kubernetes.io/certificate-arn: <PUT YOUR CRT ARN> 
+    alb.ingress.kubernetes.io/security-groups: <PUT YOUR SG ID> 
+    alb.ingress.kubernetes.io/healthcheck-path: / 
+    alb.ingress.kubernetes.io/success-codes: 200-404 
+    alb.ingress.kubernetes.io/target-type: ip 
+    external-dns.alpha.kubernetes.io/hostname: flux-webhook-receiver.<your domain> 
+  labels: 
+    app: notification-controller 
+spec: 
+  rules: 
+  - host: flux-webhook-receiver.<your domain> 
+    http: 
+      paths: 
+      - pathType: Prefix 
+        path: / 
+        backend: 
+          service: 
+            name: webhook-receiver 
+            port: 
+              number: 80 
