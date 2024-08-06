@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ks-eks-1-helm-provider-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: ks-crossplane-cluster-1
+  path: ./ch10/clusters/multi-cluster-crossplane/resources/crossplane/clusters/eks-1/provider-config
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+  - apiVersion: k8s.crossplane.lazaroff.pro/v1alpha1
+    kind: AmazonEKS
+    name: crossplane-eks-1
+    namespace: flux-system
+  wait: true
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s

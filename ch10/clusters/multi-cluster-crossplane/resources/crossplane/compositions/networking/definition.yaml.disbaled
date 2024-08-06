@@ -1,0 +1,113 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xawsnetworkings.net.aws.crossplane.lazaroff.pro
+spec:
+  group: net.aws.crossplane.lazaroff.pro
+  names:
+    kind: XAwsNetworking
+    plural: xawsnetworkings
+  claimNames:
+    kind: AWSNetworking
+    plural: awsnetworkings
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                clusterName:
+                  type: string
+                  description: ID of this Network that other objects will use to refer to it.
+                parameters:
+                  type: object
+                  description: Network configuration parameters.
+                  properties:
+                    region:
+                      type: string
+                    vpc:
+                      type: object
+                      description: VPC configuration parameters.
+                      properties:
+                        cidrBlock:
+                          description: VPC CIDR Block - example 10.0.0.0/16
+                          type: string
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Tags to apply to the VPC.
+                      required:
+                      - cidrBlock
+                      - tags
+                    subnets:
+                      type: object
+                      description: Subnets tags and CIDRs Blocks configuration parameters.
+                      properties:
+                        cidrBlock-az-a:
+                          description: Route CIDR Block - example 10.0.1.0/24
+                          type: string
+                        cidrBlock-az-b:
+                          description: Route CIDR Block - example 10.0.2.0/24
+                          type: string
+                        cidrBlock-az-c:
+                          description: Route CIDR Block - example 10.0.3.0/24
+                          type: string
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Tags to apply to the Subnets.
+                      required:
+                      - cidrBlock-az-a
+                      - cidrBlock-az-b
+                      - cidrBlock-az-c
+                      - tags
+                    sg:
+                      type: object
+                      description: Security Group labels and rule names.
+                      properties:
+                        labels:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Labels to apply to the Security Groups.
+                        ruleNames:
+                          type: object
+                          properties:
+                            inbound:
+                              type: string
+                              description: Name for inbound security group rule
+                            outbound:
+                              type: string
+                              description: Name for outbound security group rule
+                          required:
+                          - inbound
+                          - outbound
+                      required:
+                      - labels
+                      - ruleNames
+                  required:
+                    - region
+                    - vpc
+                    - subnets
+                    - sg
+              required:
+                - clusterName
+                - parameters
+            status:
+              type: object
+              properties:
+                subnetIds:
+                  type: array
+                  items:
+                    type: string
+                securityGroupClusterIds:
+                  type: array
+                  items:
+                    type: string

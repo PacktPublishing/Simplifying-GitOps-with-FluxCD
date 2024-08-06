@@ -1,0 +1,9 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - crossplane-cluster-1.yaml
+  - eks-1-helm-provider-config.yaml
+  - eks-1-release-flux.yaml
+  - eks-1-release-flux-sync.yaml
+  - ks-podinfo-eks-1.yaml

@@ -1,0 +1,9 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: upbound-provider-aws-eks
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-eks:v1.9.1
+  packagePullPolicy: IfNotPresent 
+  revisionActivationPolicy: Automatic
+  revisionHistoryLimit: 1

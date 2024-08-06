@@ -1,0 +1,18 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ks-apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: ks-repos
+  path: ./ch10/clusters/multi-cluster-crossplane/apps
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s

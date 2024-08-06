@@ -1,0 +1,104 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: amazon-eks
+spec:
+  compositeTypeRef:
+    apiVersion: k8s.crossplane.lazaroff.pro/v1alpha1
+    kind: XAmazonEKS
+  
+  writeConnectionSecretsToNamespace: crossplane-system
+
+  resources:
+    ### Nested use of XAwsNetworking XR
+    - name: compositeNetworkEKS
+      base:
+        apiVersion: net.aws.crossplane.lazaroff.pro/v1alpha1
+        kind: XAwsNetworking
+      patches:
+        - fromFieldPath: spec.clusterName
+          toFieldPath: spec.clusterName
+        - fromFieldPath: spec.parameters.region
+          toFieldPath: spec.parameters.region
+        - fromFieldPath: spec.parameters.vpc.cidrBlock
+          toFieldPath: spec.parameters.vpc.cidrBlock
+        - fromFieldPath: spec.parameters.vpc.tags
+          toFieldPath: spec.parameters.vpc.tags
+        - fromFieldPath: spec.parameters.subnets.tags
+          toFieldPath: spec.parameters.subnets.tags
+        - fromFieldPath: spec.parameters.subnets.cidrBlock-az-a
+          toFieldPath: spec.parameters.subnets.cidrBlock-az-a
+        - fromFieldPath: spec.parameters.subnets.cidrBlock-az-b
+          toFieldPath: spec.parameters.subnets.cidrBlock-az-b
+        - fromFieldPath: spec.parameters.subnets.cidrBlock-az-c
+          toFieldPath: spec.parameters.subnets.cidrBlock-az-c
+        - fromFieldPath: spec.parameters.sg.labels
+          toFieldPath: spec.parameters.sg.labels
+        - fromFieldPath: spec.parameters.sg.ruleNames.inbound
+          toFieldPath: spec.parameters.sg.ruleNames.inbound
+        - fromFieldPath: spec.parameters.sg.ruleNames.outbound
+          toFieldPath: spec.parameters.sg.ruleNames.outbound
+
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.subnetIds
+          toFieldPath: status.subnetIds
+          policy:
+            fromFieldPath: Required
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.securityGroupClusterIds
+          toFieldPath: status.securityGroupClusterIds
+          policy:
+            fromFieldPath: Required
+    
+    ### Nested use of XAwsEks XR
+    - name: compositeClusterEKS
+      base:
+        apiVersion: eks.aws.crossplane.lazaroff.pro/v1alpha1
+        kind: XAwsEks
+      connectionDetails:
+        - fromConnectionSecretKey: kubeconfig
+      patches:
+        - fromFieldPath: spec.clusterName
+          toFieldPath: spec.clusterName
+        - fromFieldPath: spec.version
+          toFieldPath: spec.version
+        - fromFieldPath: spec.parameters.nodeGroup.name
+          toFieldPath: spec.parameters.nodeGroup.name
+        - fromFieldPath: spec.parameters.nodeGroup.tags
+          toFieldPath: spec.parameters.nodeGroup.tags
+        - fromFieldPath: spec.parameters.nodeGroup.amiType
+          toFieldPath: spec.parameters.nodeGroup.amiType
+        - fromFieldPath: spec.parameters.nodeGroup.capacityType
+          toFieldPath: spec.parameters.nodeGroup.capacityType
+        - fromFieldPath: spec.parameters.nodeGroup.instanceTypes
+          toFieldPath: spec.parameters.nodeGroup.instanceTypes
+        - fromFieldPath: spec.parameters.nodeGroup.diskSize
+          toFieldPath: spec.parameters.nodeGroup.diskSize
+        - fromFieldPath: spec.clusterName
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+        - fromFieldPath: metadata.uid
+          toFieldPath: spec.writeConnectionSecretToRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-eks"
+        - fromFieldPath: spec.writeConnectionSecretToRef.namespace
+          toFieldPath: spec.writeConnectionSecretToRef.namespace
+        - fromFieldPath: spec.parameters.region
+          toFieldPath: spec.parameters.region
+        - fromFieldPath: spec.parameters.nodeGroup.nodesMinSize
+          toFieldPath: spec.parameters.nodeGroup.nodesMinSize
+        - fromFieldPath: spec.parameters.nodeGroup.nodesDesiredSize
+          toFieldPath: spec.parameters.nodeGroup.nodesDesiredSize
+        - fromFieldPath: spec.parameters.nodeGroup.nodesMaxSize
+          toFieldPath: spec.parameters.nodeGroup.nodesMaxSize
+        - fromFieldPath: spec.parameters.mapUsers
+          toFieldPath: spec.parameters.mapUsers
+        - fromFieldPath: status.subnetIds
+          toFieldPath: spec.parameters.subnetIds
+          policy:
+            fromFieldPath: Required
+        - fromFieldPath: status.securityGroupClusterIds
+          toFieldPath: spec.parameters.securityGroupClusterIds
+          policy:
+            fromFieldPath: Required

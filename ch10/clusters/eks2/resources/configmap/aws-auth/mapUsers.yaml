@@ -1,0 +1,4 @@
+- groups:
+  - system:masters
+  userarn: arn:aws:iam::563782469212:user/eks2@lazaroff.pro
+  username: eks2@lazaroff.pro

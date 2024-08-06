@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ks-podinfo-eks-2
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: ks-crossplane-cluster-2
+  path: ./ch10/apps/podinfo-eks-2
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  kubeConfig:
+    secretRef:
+      name: eks-2-cluster-kubeconfig
+      key: kubeconfig
+  healthChecks:
+  - apiVersion: k8s.crossplane.lazaroff.pro/v1alpha1
+    kind: AmazonEKS
+    name: crossplane-eks-2
+    namespace: flux-system
+  wait: true
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s

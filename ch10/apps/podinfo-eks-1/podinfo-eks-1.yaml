@@ -1,0 +1,38 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: podinfo
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  url: https://stefanprodan.github.io/podinfo
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: podinfo
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: podinfo
+      sourceRef:
+        kind: HelmRepository
+        name: podinfo
+        namespace: flux-system
+      version: ">=6.7.0"
+  interval: 1m
+  maxHistory: 3
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
+    cleanupOnFail: true
+  rollback:
+    disableWait: true
+    cleanupOnFail: true
+  values:
+    ui:
+      message: "Welcome to our [Packt>] GitOps Simplified - AWS EKS 1!"
+      logo: "https://avatars.githubusercontent.com/u/56252176?s=200&v=4"

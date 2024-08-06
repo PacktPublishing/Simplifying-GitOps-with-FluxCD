@@ -1,0 +1,73 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: flux2-sync-eks-2
+spec:
+  rollbackLimit: 3
+  forProvider:
+    namespace: flux-system
+    chart:
+      name: flux2-sync
+      repository: https://fluxcd-community.github.io/helm-charts
+      version: "1.9.0"
+    values:
+      secret:
+        create: true
+        data:
+          identity: |
+
+          identity.pub: |
+
+          known_hosts: |
+
+      gitRepository:
+        spec:
+          url: "ssh://git@github.com/grglzrv/simplifying-gitops-with-flux-cd"
+          interval: 1m
+          ref:
+            branch: main
+
+      kustomization:
+        spec:
+          interval: 1m
+          path: "./ch10/clusters/eks2"
+          prune: false
+
+      kustomizationlist:
+        - spec:
+            interval: 1m
+            path: ./ch10/clusters/eks2/repos
+            prune: false
+            timeout: 5m
+        - spec:
+            dependsOn:
+            - path: ./ch10/clusters/eks2/repos
+            interval: 1m
+            path: ./ch10/clusters/eks2/apps
+            prune: false
+            timeout: 5m
+
+    set:
+      - name: secret.data.identity
+        valueFrom:
+          secretKeyRef:
+            name: flux-system
+            namespace: flux-system
+            key: identity
+
+      - name: secret.data.identity\.pub
+        valueFrom:
+          secretKeyRef:
+            name: flux-system
+            namespace: flux-system
+            key: identity.pub
+
+      - name: secret.data.known_hosts
+        valueFrom:
+          secretKeyRef:
+            name: flux-system
+            namespace: flux-system
+            key: known_hosts
+
+  providerConfigRef: 
+    name: helm-provider-eks-2

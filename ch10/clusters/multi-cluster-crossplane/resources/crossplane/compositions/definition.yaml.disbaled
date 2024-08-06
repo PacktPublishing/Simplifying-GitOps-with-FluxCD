@@ -1,0 +1,159 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xamazonekss.k8s.crossplane.lazaroff.pro
+spec:
+  group: k8s.crossplane.lazaroff.pro
+  names:
+    kind: XAmazonEKS
+    plural: xamazonekss
+  claimNames:
+    kind: AmazonEKS
+    plural: amazonekss
+  connectionSecretKeys:
+  - kubeconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              clusterName:
+                type: string
+                description: ID of this Cluster that other objects will use to refer to it.
+              version:
+                type: string
+                description: Kubernetes version. Defaults to EKS Cluster Kubernetes version.
+              parameters:
+                type: object
+                description: Cluster configuration parameters.
+                properties:
+                  region:
+                    type: string
+                  nodeGroup:
+                    type: object
+                    description: Cluster node configuration parameters.
+                    properties:
+                      name:
+                        description: NodeGroup name
+                        type: string
+                      amiType:
+                        description: The AMI type for your node group.  Valid values - AL2023_ARM_64_STANDARD, AL2023_X86_64_STANDARD, AL2_ARM_64, AL2_X86_64, BOTTLEROCKET_ARM_64, BOTTLEROCKET_X86_64 etc.
+                        type: string
+                      capacityType:
+                        description: Type of capacity associated with the EKS Node Group Valid values - ON_DEMAND and SPOT
+                        type: string
+                      instanceTypes:
+                        description: The size of the nodeGroup; small, medium, large
+                        type: string
+                      diskSize:
+                        type: integer
+                        description: Disk size in GiB for worker nodeGroup. Defaults to 50 for Windows, 20 all other node groups.
+                      nodesMinSize:
+                        type: integer
+                        description: Min node count, from 1 to 10.
+                      nodesDesiredSize:
+                        type: integer
+                        description: Desired node count, from 1 to 100.
+                      nodesMaxSize:
+                        type: integer
+                        description: max node count, from 1 to 100.
+                      tags:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Tags to apply to the NodeGroup.
+                    required:
+                    - nodesDesiredSize
+                    - tags
+                  vpc:
+                    type: object
+                    description: VPC configuration parameters.
+                    properties:
+                      cidrBlock:
+                        description: VPC CIDR Block - example 10.0.0.0/16
+                        type: string
+                      tags:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Tags to apply to the VPC.
+                    required:
+                    - cidrBlock
+                    - tags
+                  subnets:
+                    type: object
+                    description: Subnets tags and CIDRs Blocks configuration parameters.
+                    properties:
+                      cidrBlock-az-a:
+                        description: Route CIDR Block - example 10.0.1.0/24
+                        type: string
+                      cidrBlock-az-b:
+                        description: Route CIDR Block - example 10.0.2.0/24
+                        type: string
+                      cidrBlock-az-c:
+                        description: Route CIDR Block - example 10.0.2.0/24
+                        type: string
+                      tags:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Tags to apply to the Subnets.
+                    required:
+                    - cidrBlock-az-a
+                    - cidrBlock-az-b
+                    - cidrBlock-az-c
+                    - tags
+                  sg:
+                    type: object
+                    description: Security Group labels and rule names.
+                    properties:
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Labels to apply to the Security Groups.
+                      ruleNames:
+                        type: object
+                        properties:
+                          inbound:
+                            type: string
+                            description: Name for inbound security group rule
+                          outbound:
+                            type: string
+                            description: Name for outbound security group rule
+                        required:
+                        - inbound
+                        - outbound
+                    required:
+                    - labels
+                    - ruleNames
+                  mapUsers:
+                    type: string
+                    description: Users to map to the EKS cluster
+                required:
+                - region
+                - nodeGroup
+                - vpc
+                - subnets
+                - sg
+            required:
+            - clusterName
+            - version
+            - parameters
+          status:
+            type: object
+            properties:
+              subnetIds:
+                type: array
+                items:
+                  type: string
+              securityGroupClusterIds:
+                type: array
+                items:
+                  type: string

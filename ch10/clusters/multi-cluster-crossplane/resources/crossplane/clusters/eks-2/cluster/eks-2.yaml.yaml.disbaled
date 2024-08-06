@@ -1,0 +1,48 @@
+---
+apiVersion: k8s.crossplane.lazaroff.pro/v1alpha1
+kind: AmazonEKS
+metadata:
+  namespace: flux-system
+  name: crossplane-eks-2
+spec:
+  clusterName: crossplane-eks-2
+  version: "1.30"
+  parameters:
+    region: eu-central-1
+    nodeGroup:
+      name: default-node-group-eks-2
+      amiType: "AL2_ARM_64"
+      capacityType: "SPOT"
+      instanceTypes: small
+      diskSize: 250
+      nodesMinSize: 1
+      nodesDesiredSize: 2
+      nodesMaxSize: 7
+      tags:
+       kubernetes.io/cluster/crossplane-eks-2: shared
+       Name: crossplane-eks-2
+    mapUsers: |
+      - groups:
+        - system:masters
+        userarn: arn:aws:iam::563782469212:user/georgi@lazaroff.pro
+        username: georgi@lazaroff.pro
+    vpc:
+      cidrBlock: "10.70.0.0/16"
+      tags:
+        Owner: "DevOps Team B"
+        Name: "devops-team-b-crossplane-vpc"
+    subnets:
+      cidrBlock-az-a: "10.70.0.0/24"
+      cidrBlock-az-b: "10.70.1.0/24"
+      cidrBlock-az-c: "10.70.2.0/24"
+      tags:
+        kubernetes.io/cluster/crossplane-eks-2: "owned"
+        kubernetes.io/role/elb: "1"
+    sg:
+      labels:
+        net.aws.crossplane.lazaroff.pro: securitygroup-cluster-2
+      ruleNames:
+        inbound: "securitygrouprule-cluster-2-inbound"
+        outbound: "securitygrouprule-cluster-2-outbound"
+  writeConnectionSecretToRef:
+    name: eks-2-cluster-kubeconfig

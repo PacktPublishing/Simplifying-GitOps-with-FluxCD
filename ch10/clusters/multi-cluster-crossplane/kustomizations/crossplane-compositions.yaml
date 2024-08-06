@@ -1,0 +1,18 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ks-crossplane-compositions
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: ks-aws-provider-config
+  path: ./ch10/clusters/multi-cluster-crossplane/resources/crossplane/compositions
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s

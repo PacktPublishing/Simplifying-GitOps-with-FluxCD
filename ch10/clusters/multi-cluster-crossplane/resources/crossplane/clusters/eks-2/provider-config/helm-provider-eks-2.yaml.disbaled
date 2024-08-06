@@ -1,0 +1,11 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: helm-provider-eks-2
+spec:
+  credentials:
+    secretRef:
+      key: kubeconfig
+      name: eks-2-cluster-kubeconfig
+      namespace: flux-system
+    source: Secret

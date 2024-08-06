@@ -1,0 +1,126 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  setup:
+    cmds:
+      - task: install_k3d
+      - task: create_cluster
+      - task: verify_cluster
+      - task: switch_context
+      - task: install_flux_operator
+      - task: generate_ssh_key
+      - task: display_public_key
+      - task: wait_for_key_copy
+      - task: create_flux_secret
+      - task: generate_age_key
+      - task: create_sops_secret
+      - task: apply_flux_instance
+      - task: create_aws_credentials_file
+      - task: dry_run_create_aws_creds
+      - task: encrypt_aws_creds
+      - task: push_aws_creds_to_repo
+      - task: print_setup_complete
+
+  install_k3d:
+    cmds:
+      - wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+    desc: Install k3d
+
+  create_cluster:
+    cmds:
+      - unset KUBECONFIG; k3d cluster create -i rancher/k3s:v1.30.0-rc1-k3s1 -s 3 ch10-crossplane
+    desc: Create Kubernetes cluster with k3d
+
+  verify_cluster:
+    cmds:
+      - echo "Verifying k3d cluster status..."
+      - until k3d cluster list | grep -q '3/3'; do
+          k3d cluster list;
+          sleep 3;
+        done
+      - echo "Cluster is up and running:"
+      - k3d cluster list
+      - echo "Press any key to continue..."
+      - read
+    desc: Verify k3d cluster is running
+
+  switch_context:
+    cmds:
+      - kubectl config use-context k3d-ch10-crossplane
+    desc: Switch context to k3d-ch10-crossplane
+
+  install_flux_operator:
+    cmds:
+      - helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator --namespace flux-system --create-namespace
+    desc: Install Flux Operator with Helm
+
+  generate_ssh_key:
+    cmds:
+      - ssh-keygen -t rsa -b 4096 -C "{{.EMAIL}}" -f ~/.ssh/id_rsa_fluxcd_ch10 -N ""
+    desc: Generate SSH key for Flux
+
+  display_public_key:
+    cmds:
+      - cat ~/.ssh/id_rsa_fluxcd_ch10.pub
+    desc: Display public SSH key
+
+  wait_for_key_copy:
+    cmds:
+      - echo "Please copy the public SSH key above and add it to your git repository."
+      - echo "In your GitHub repo go to Settings -> Deploy keys -> Add deploy key -> add title 'flux-system-ch10', paste the SSH public key, check 'Allow write access', and click 'Add key'."
+      - echo "Press any key to continue after adding the public SSH key to your repository..."
+      - read
+    desc: Wait for user to copy SSH key
+
+  create_flux_secret:
+    cmds:
+      - flux create secret git flux-system --url=ssh://git@github.com/{{.GITHUB_USERNAME}}/Simplifying-GitOps-with-FluxCD --private-key-file=$HOME/.ssh/id_rsa_fluxcd_ch10
+    desc: Create Flux secret with private SSH key
+
+  generate_age_key:
+    cmds:
+      - age-keygen -o age.agekey
+      - echo "Public key:"
+      - grep 'public key' age.agekey | awk '{print $4}' > age.pub
+    desc: Generate AGE key
+
+  create_sops_secret:
+    cmds:
+      - cat age.agekey | kubectl create secret generic sops-age --namespace=flux-system --from-file=age.agekey=/dev/stdin
+    desc: Create Kubernetes secret named "sops-age" with AGE key
+
+  apply_flux_instance:
+    cmds:
+      - kubectl apply -f https://raw.githubusercontent.com/{{.GITHUB_USERNAME}}/Simplifying-GitOps-with-FluxCD/main/ch10/clusters/multi-cluster-crossplane/apps/flux/flux-instance.yaml
+    desc: Deploy FluxInstance CRD
+
+  create_aws_credentials_file:
+    cmds:
+      - echo "[default]" > aws-credentials.txt
+      - echo "aws_access_key_id = {{.AWS_ACCESS_KEY_ID}}" >> aws-credentials.txt
+      - echo "aws_secret_access_key = {{.AWS_SECRET_ACCESS_KEY}}" >> aws-credentials.txt
+    desc: Create AWS credentials file 
+
+  dry_run_create_aws_creds:
+    cmds:
+      - kubectl create secret generic aws-creds -n crossplane-system --from-file=creds=./aws-credentials.txt --dry-run=client -o yaml > aws-creds.yaml
+    desc: Dry-run to create local aws-creds.yaml file
+
+  encrypt_aws_creds:
+    cmds:
+      - sops --age=$(cat age.pub) --encrypt --encrypted-regex '^(data|stringData)$' --in-place aws-creds.yaml
+    desc: Encrypt AWS credentials file with Age key
+
+  push_aws_creds_to_repo:
+    cmds:
+      - echo "Please push aws-creds.yaml to your git repository under ./ch10/multi-cluster-crossplane/resources/sops directory."
+      - echo "Press any key to continue after pushing the file..."
+      - read
+    desc: Push encrypted AWS credentials file to git repository
+
+  print_setup_complete:
+    cmds:
+      - echo "Local Packt Management Kubernetes server is set up. Author - Georgi Lazarov."
+    desc: Print setup completion message
