@@ -119,20 +119,20 @@ tasks:
 
   dry_run_create_aws_creds:
     cmds:
-      - kubectl create secret generic aws-creds -n crossplane-system --from-file=creds=./aws-credentials.txt --dry-run=client -o yaml > aws-creds.yaml
+      - kubectl create secret generic aws-creds -n crossplane-system --from-file=creds=./aws-credentials.txt --dry-run=client -o yaml > ../clusters/multi-cluster-crossplane/resources/sops/aws-creds-sops.yaml
     desc: Dry-run to create local aws-creds.yaml file
 
   encrypt_aws_creds:
     cmds:
-      - sops --age=$(cat age.pub) --encrypt --encrypted-regex '^(data|stringData)$' --in-place aws-creds.yaml
+      - sops --age=$(cat age.pub) --encrypt --encrypted-regex '^(data|stringData)$' --in-place ../clusters/multi-cluster-crossplane/resources/sops/aws-creds-sops.yaml
     desc: Encrypt AWS credentials file with Age key
 
   push_aws_creds_to_repo:
     cmds:
-      - echo "Please push aws-creds.yaml to your git repository under ./ch10/multi-cluster-crossplane/resources/sops directory."
-      - echo "Press any key to continue after pushing the file..."
-      - read
-    desc: Push encrypted AWS credentials file to git repository
+      - git add ../clusters/multi-cluster-crossplane/resources/sops/aws-creds-sops.yaml
+      - git commit -m "Push aws creds"
+      - git push
+    desc: Commit and push the updated encrypted AWS creds YAML file to the repository
 
   print_setup_complete:
     cmds:
