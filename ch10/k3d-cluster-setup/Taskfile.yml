@@ -16,6 +16,8 @@ tasks:
       - task: create_flux_secret
       - task: generate_age_key
       - task: create_sops_secret
+      - task: update_flux_gitrepo_url
+      - task: push_flux_instance_update
       - task: apply_flux_instance
       - task: create_aws_credentials_file
       - task: dry_run_create_aws_creds
@@ -90,6 +92,18 @@ tasks:
     cmds:
       - cat age.agekey | kubectl create secret generic sops-age --namespace=flux-system --from-file=age.agekey=/dev/stdin
     desc: Create Kubernetes secret named "sops-age" with AGE key
+
+  update_flux_gitrepo_url:
+    cmds:
+      - sed -i '' "s|PacktPublishing|{{.GITHUB_USERNAME}}|g" ../clusters/multi-cluster-crossplane/apps/flux/flux-instance.yaml
+    desc: Update GITHUB_USERNAME in the Flux instance YAML file
+
+  push_flux_instance_update:
+    cmds:
+      - git add ../clusters/multi-cluster-crossplane/apps/flux/flux-instance.yaml
+      - git commit -m "Update GitRepository URL"
+      - git push
+    desc: Commit and push the updated Flux instance YAML file to the repository
 
   apply_flux_instance:
     cmds:

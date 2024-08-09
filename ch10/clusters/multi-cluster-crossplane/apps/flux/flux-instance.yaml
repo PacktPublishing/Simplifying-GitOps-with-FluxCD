@@ -20,7 +20,7 @@ spec:
     - image-automation-controller
   sync:
     kind: GitRepository
-    url: "ssh://git@github.com/grglzrv/simplifying-gitops-with-flux-cd"
+    url: "ssh://git@github.com/PacktPublishing/Simplifying-GitOps-with-FluxCD"
     ref: "refs/heads/main"
     path: "./ch10/clusters/multi-cluster-crossplane"
     pullSecret: "flux-system"
