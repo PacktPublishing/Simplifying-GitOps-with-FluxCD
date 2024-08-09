@@ -72,13 +72,13 @@ The `setup` task will perform the following steps:
 9. **Create Flux Secret**: Creates a Flux secret with the private SSH key.
 10. **Generate AGE Key**: Generates an AGE key for encrypting secrets.
 11. **Create SOPS Secret**: Creates a Kubernetes secret for SOPS with the AGE key.
-12. **Update Flux Instance URL: Updates the flux-instance.yaml file to replace "PacktPublishing" with your GitHub username.
-13. **Push Flux Instance Update: Commits and pushes the updated flux-instance.yaml file to your GitHub repository.
+12. **Update Flux Instance URL**: Updates the flux-instance.yaml file to replace "PacktPublishing" with your GitHub username.
+13. **Push Flux Instance Update**: Commits and pushes the updated flux-instance.yaml file to your GitHub repository.
 14. **Apply Flux Instance**: Deploys the Flux instance CRD.
-15. **Create AWS Credentials File**: Prompts you to create an AWS credentials file.
+15. **Create AWS Credentials File**: Create an AWS credentials file.
 16. **Dry Run Create AWS Creds**: Creates a local AWS credentials YAML file.
-17. **Encrypt AWS Creds**: Encrypts the AWS credentials file using AGE.
-18. **Push AWS Creds to Repo**: Prompts you to push the encrypted AWS credentials file to your GitHub repository.
+17. **Encrypt AWS Creds**: Encrypts the AWS credentials file using SOSP and AGE.
+18. **Push AWS Creds to Repo**: Push the encrypted AWS credentials file to your GitHub repository.
 19. **Print Setup Complete**: Prints a message indicating the setup is complete.
 
 ## Author
